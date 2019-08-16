@@ -4,14 +4,16 @@ from status.models import Status
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ['user', 'content', 'image']
+        fields = ['id', 'user', 'content', 'image']
 
     def validate_content(self, value):
+        # print('value----', value)
         if len(value) > 30000:
             raise serializers.ValidationError('Content is too long')
         return value
 
     def validate(self, data):
+        # print('data----', data)
         content = data.get('content', None)
         if content == '':
             content = None

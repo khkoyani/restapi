@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from status.models import Status
 from .serializers import StatusSerializer
 from django.shortcuts import get_object_or_404
+import json
 
 # class StatusApiList(APIView):
 #     permission_classes = []
@@ -14,12 +15,18 @@ from django.shortcuts import get_object_or_404
 #         serializer = StatusSerializer(qs, many=True)
 #         return Response(serializer.data)
 
+def json_data(data):
+    try:
+        return json.loads(data)
+    except ValueError:
+        return False
 
 class StatusApiList(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.ListAPIView):
     permission_classes = []
     authentication_classes = []
     serializer_class = StatusSerializer
+    id_query= None
 
     def get_queryset(self):
         qs = Status.objects.all()
@@ -29,18 +36,24 @@ class StatusApiList(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
         return qs
 
     def get_object(self):
+        print(f'id_query------{self.id_query}')
         obj = None
-        id_query = self.request.GET.get('id', None)
-        print(self.request.data)
-        if id_query is not None:
-            obj = get_object_or_404(self.get_queryset(), id=id_query)
+        if self.id_query is not None:
+            obj = get_object_or_404(self.get_queryset(), id=self.id_query)
             self.check_object_permissions(self.request, obj)
         return obj
 
     def get(self, request, *args, **kwargs):
-        id_query = self.request.GET.get('id', None)
-        # print('body   --', self.request.body)
-        # print('data  --', self.request.data)
+        id_from_url = request.GET.get('id', None)
+        id_from_json_data = None
+
+        json_request_data = json_data(request.body)
+        if json_request_data:
+            id_from_json_data = json_request_data.get('id', None)
+
+        id_query = id_from_url or id_from_json_data or None
+
+        self.id_query = id_query
         if id_query is not None:
             return self.retrieve(request, *args, **kwargs)
         return super().get(request, *args, **kwargs)
@@ -49,40 +62,57 @@ class StatusApiList(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
         return self.create(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
+        id_from_url = request.GET.get('id', None)
+        id_from_json_data = None
+
+        json_request_data = json_data(request.body)
+        if json_request_data:
+            id_from_json_data = json_request_data.get('id', None)
+
+        id_query = id_from_url or id_from_json_data or None
+
+        self.id_query = id_query
         return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        print('body   --', self.request.body)
-        print('data  --', self.request.data)
+        id_from_url = request.GET.get('id', None)
+        id_from_json_data = None
+        json_request_data = json_data(request.body)
+        if json_request_data:
+            id_from_json_data = json_request_data.get('id', None)
+        id_from_request_data = request.data.get('id', None)
+        id_query = id_from_url or id_from_json_data or id_from_request_data or None
+        print('in put')
+        self.id_query = id_query
         return self.update(request, *args, **kwargs)
 
-
-class StatusApiCreate(generics.CreateAPIView):
-    permission_classes = []
-    authentication_classes = []
-    serializer_class = StatusSerializer
-    queryset = Status.objects.all()
-
-class StatusApiDetail(generics.RetrieveAPIView):
-    permission_classes = []
-    authentication_classes = []
-    serializer_class = StatusSerializer
-    lookup_field = 'id'
-
-    def get_queryset(self):
-        return Status.objects.all()
-
-
-class StatusApiUpdate(generics.UpdateAPIView):
-    permission_classes = []
-    authentication_classes = []
-    serializer_class = StatusSerializer
-    lookup_field = 'id'
-    queryset = Status.objects.all()
-
-class StatusApiDelete(generics.DestroyAPIView):
-    permission_classes = []
-    authentication_classes = []
-    serializer_class = StatusSerializer
-    lookup_field = 'id'
-    queryset = Status.objects.all()
+#
+# class StatusApiCreate(generics.CreateAPIView):
+#     permission_classes = []
+#     authentication_classes = []
+#     serializer_class = StatusSerializer
+#     queryset = Status.objects.all()
+#
+# class StatusApiDetail(generics.RetrieveAPIView):
+#     permission_classes = []
+#     authentication_classes = []
+#     serializer_class = StatusSerializer
+#     lookup_field = 'id'
+#
+#     def get_queryset(self):
+#         return Status.objects.all()
+#
+#
+# class StatusApiUpdate(generics.UpdateAPIView):
+#     permission_classes = []
+#     authentication_classes = []
+#     serializer_class = StatusSerializer
+#     lookup_field = 'id'
+#     queryset = Status.objects.all()
+#
+# class StatusApiDelete(generics.DestroyAPIView):
+#     permission_classes = []
+#     authentication_classes = []
+#     serializer_class = StatusSerializer
+#     lookup_field = 'id'
+#     queryset = Status.objects.all()

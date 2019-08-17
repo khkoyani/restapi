@@ -123,3 +123,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static_cdn', 'media')
 MEDIA_URL = '/media/'
+
+from .rest_conf.main import *

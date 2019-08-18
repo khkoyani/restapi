@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 from rest_framework import permissions, generics
 from rest_framework.response import Response
 from django.db.models import Q
-from .serializers import UserSerializer
+from .serializers import UserRegisterSerializer
+from .permissions import AnonUserPermissionOnly
 
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -67,9 +68,9 @@ class AuthView(APIView):
 
 class RegisterView(generics.CreateAPIView):
     # Same as RegisterView2 but moved most methods to serializerclass
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AnonUserPermissionOnly]
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserRegisterSerializer
 
     def get_serializer_context(self, *args, **kwargs):
         #makes sure the request is passed to the rerializer so it can be used in token response"

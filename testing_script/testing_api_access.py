@@ -55,26 +55,30 @@ def req(method='get', data={}, id=1, is_json=True):
 # req_img(method='put', id=21, data={'user': 1, 'content': ''}, is_json=False, image_path=image_path)
 
 REFRESH_ENDPOINT = BASE_URL + API_ENDPOINT + 'token-refresh/'
-def get_token(username='khkoyani14', password='Shreeji323', refresh=False, token=None):
-    data = {'username': username, 'password': password, 'password2': password,
-            'email': 'khkoyani14@gmail.com'}
 
-    AUTH_ENDPOINT = BASE_URL + 'api/auth/register/'
+token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNSwidXNlcm5hbWUiOiJraGtveWFuaTE1IiwiZXhwIjoxNTY2MTEwNzY0LCJlbWFpbCI6Imtoa295YW5pMTVAZ21haWwuY29tIiwib3JpZ19pYXQiOjE1NjYxMTA0NjR9.OwKU-nu-Pv7I2OIpNXrd_yTpCLbt2pffp77O-1IXYTA'
+def get_token(username='khkoyani15', password='Shreeji323', refresh=False, token=None):
+    data = {'username': username, 'password': password, 'password2': password,
+            'email': 'khkoyani15@gmail.com'}
+
+    AUTH_ENDPOINT = BASE_URL + 'api/auth/'
     headers = {'Content-Type': 'application/json'}
-    if refresh == True:
+    if token:
+        headers['Authorization'] = 'JWT ' + str(token)
         data = {'token': str(token)}
-        r = requests.request(method='post', url=AUTH_ENDPOINT+'refresh/',
+        r = requests.request(method='post', url=AUTH_ENDPOINT,
                              data=json.dumps(data), headers=headers)
     else:
         r = requests.request(method='post', url=AUTH_ENDPOINT,
                              data=json.dumps(data), headers=headers)
-        print(r.json())
-        print('------------------------------')
-        print(r.json()['token_response']['token'])
+    # print(r.json())
+    print('------------------------------')
+    # print(r.json()['token_response']['token'])
 
-    return r.json()['token_response']['token']
+    return r.json()['token']
 
-token = get_token()
+# token = get_token()
+# get_token()
 
 # refresh = get_token(refresh=True, token=token)
 
@@ -97,5 +101,10 @@ def req_img(method='get', data={}, id=None, is_json=True, image_path=None):
     print(r.status_code)
     print('----------------')
 #
-# req_img(method='put', id=23, data={'content':'new testing tokens post data'},
+# req_img(method='put', id=1, data={'content':'permissions testing tokens put data'},
+#         is_json=False)
+
+# req_img(method='post', data={'user': '4', 'content':'permissions testing tokens POST data'},
 #         image_path=image_path, is_json=False)
+
+req_img(method='get', id=1, is_json=False)

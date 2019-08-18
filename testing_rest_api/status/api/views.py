@@ -5,6 +5,7 @@ from status.models import Status
 from .serializers import StatusSerializer
 from django.shortcuts import get_object_or_404
 import json
+from .permissions import IsOwnerOrReadOnly
 
 # class StatusApiList(APIView):
 #     permission_classes = []
@@ -87,6 +88,7 @@ def json_data(data):
 #         return self.update(request, *args, **kwargs)
 
 class StatusApiList(mixins.CreateModelMixin, generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
     serializer_class = StatusSerializer
 
     def get_queryset(self):
@@ -104,6 +106,7 @@ class StatusApiList(mixins.CreateModelMixin, generics.ListAPIView):
         serializer.save(user=self.request.user)
 
 class StatusApiDetail(generics.RetrieveAPIView, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     serializer_class = StatusSerializer
     queryset = Status.objects.all()
     lookup_field = 'id'

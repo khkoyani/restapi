@@ -56,7 +56,9 @@ def req(method='get', data={}, id=1, is_json=True):
 
 REFRESH_ENDPOINT = BASE_URL + API_ENDPOINT + 'token-refresh/'
 def get_token(username='khkoyani', password='Shreeji323', refresh=False, token=None):
-    data = {'username': username, 'password': password}
+    data = {'username': username, 'password': password,
+            'email': 'khkoyani@gmail.com'}
+
     AUTH_ENDPOINT = BASE_URL + 'api/auth/'
     headers = {'Content-Type': 'application/json'}
     if refresh == True:
@@ -66,10 +68,10 @@ def get_token(username='khkoyani', password='Shreeji323', refresh=False, token=N
     else:
         r = requests.request(method='post', url=AUTH_ENDPOINT,
                              data=json.dumps(data), headers=headers)
-
+        print(r.json())
     return r.json()['token']
 
-# token = get_token()
+token = get_token()
 
 # refresh = get_token(refresh=True, token=token)
 
@@ -91,6 +93,6 @@ def req_img(method='get', data={}, id=None, is_json=True, image_path=None):
     print(r.text)
     print(r.status_code)
     print('----------------')
-
-req_img(method='put', id=23, data={'content':'testing tokens post data'},
-        image_path=image_path, is_json=False)
+#
+# req_img(method='put', id=23, data={'content':'new testing tokens post data'},
+#         image_path=image_path, is_json=False)

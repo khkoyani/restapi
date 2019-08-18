@@ -3,33 +3,38 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework.response import Response
-from django.conf import settings
-from django.utils import timezone
+from django.db.models import Q
 
-expire_delta = settings.JWT_AUTH['JWT_REFRESH_EXPIRATION_DELTA']
+
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+jwt_response_payload_handler = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
 
-
-def jwt_response_payload_handler(token, user=None, request=None):
-    return {
-        'token': token,
-        'user': user.username,
-        'expires': timezone.now() + expire_delta
-        # 'user': UserSerializer(user, context={'request': request}).data
-    }
+User = get_user_model()
 
 class AuthView(APIView):
-    permission_classes = [permissions.AllowAny]  #Import to include
+    permission_classes = [permissions.AllowAny]  #Important to include
 
     def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(password=password, username=username)
-        payload = jwt_payload_handler(user)
-        token = jwt_encode_handler(payload)
-        response = jwt_response_payload_handler(token, user, request)
-        return Response(response)
-
-
-
+        if not request.user.is_authenticated:
+            username = request.data.get('username', None)
+            password = request.data.get('password')
+            email = request.data.get('email', None)
+            qs = User.objects.filter(
+                Q(username__iexact=username) | Q(email__iexact=email))
+            print(qs)
+            print(qs.count())
+            if qs.count() == 1:
+                user_obj = qs.first()
+                if user_obj.check_password(password):
+                    user = user_obj
+                    payload = jwt_payload_handler(user)
+                    token = jwt_encode_handler(payload)
+                    response = jwt_response_payload_handler(token, user, request)
+                    return Response(response)
+                else:
+                    return Response({'detail': 'Incorrect Password'}, status=400)
+            else:
+                return Response({'detail': 'Authentication resulting in multiple users'}, status=400)
+        else:
+            return Response({'detail': 'Already signed in'}, status=400)

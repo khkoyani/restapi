@@ -235,7 +235,7 @@
 			"file": "testing_rest_api/testing_rest_api/settings.py",
 			"settings":
 			{
-				"buffer_size": 3205,
+				"buffer_size": 3303,
 				"line_ending": "Windows"
 			}
 		}
@@ -581,7 +581,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3205,
+						"buffer_size": 3303,
 						"regions":
 						{
 						},

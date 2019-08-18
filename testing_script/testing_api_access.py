@@ -55,11 +55,11 @@ def req(method='get', data={}, id=1, is_json=True):
 # req_img(method='put', id=21, data={'user': 1, 'content': ''}, is_json=False, image_path=image_path)
 
 REFRESH_ENDPOINT = BASE_URL + API_ENDPOINT + 'token-refresh/'
-def get_token(username='khkoyani', password='Shreeji323', refresh=False, token=None):
-    data = {'username': username, 'password': password,
-            'email': 'khkoyani@gmail.com'}
+def get_token(username='khkoyani14', password='Shreeji323', refresh=False, token=None):
+    data = {'username': username, 'password': password, 'password2': password,
+            'email': 'khkoyani14@gmail.com'}
 
-    AUTH_ENDPOINT = BASE_URL + 'api/auth/'
+    AUTH_ENDPOINT = BASE_URL + 'api/auth/register/'
     headers = {'Content-Type': 'application/json'}
     if refresh == True:
         data = {'token': str(token)}
@@ -69,7 +69,10 @@ def get_token(username='khkoyani', password='Shreeji323', refresh=False, token=N
         r = requests.request(method='post', url=AUTH_ENDPOINT,
                              data=json.dumps(data), headers=headers)
         print(r.json())
-    return r.json()['token']
+        print('------------------------------')
+        print(r.json()['token_response']['token'])
+
+    return r.json()['token_response']['token']
 
 token = get_token()
 
